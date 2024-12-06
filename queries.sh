@@ -8,7 +8,7 @@ echo -e "\nTotal number of goals in all games from winning teams:"
 echo "$($PSQL "SELECT SUM(winner_goals) FROM games")"
 
 echo -e "\nTotal number of goals in all games from both teams combined:"
-echo "$($PSQL "SELECT SUM(winner_goals)+ SUM(opponent_goals) FROM games")"
+echo "$($PSQL "SELECT SUM(winner_goals + opponent_goals) FROM games")"
 
 echo -e "\nAverage number of goals in all games from the winning teams:"
 echo "$($PSQL "SELECT AVG(winner_goals) FROM games")"
@@ -17,25 +17,25 @@ echo -e "\nAverage number of goals in all games from the winning teams rounded t
 echo "$($PSQL "SELECT ROUND(AVG(winner_goals),2) FROM games")"
 
 echo -e "\nAverage number of goals in all games from both teams:"
-echo "$($PSQL "SELECT AVG(winner_goals)+AVG(opponent_goals) FROM games")"
+echo "$($PSQL "SELECT AVG(winner_goals + opponent_goals) from games")"
 
 echo -e "\nMost goals scored in a single game by one team:"
-echo "$($PSQL "SELECT MAX(winner_goals) FROM games GROUP BY game_id ORDER BY winner_goals DESC LIMIT 1")"
+echo "$($PSQL "SELECT MAX(winner_goals) AS "most_goals" FROM games")"
 
 echo -e "\nNumber of games where the winning team scored more than two goals:"
-echo "$($PSQL "SELECT count(*) FROM games WHERE winner_goals > 2")"
+echo $($PSQL "SELECT COUNT(*) FROM games WHERE winner_goals > 2")
 
 echo -e "\nWinner of the 2018 tournament team name:"
-echo "$($PSQL "SELECT t.name FROM games AS g LEFT JOIN teams AS t ON g.winner_id = t.team_id WHERE year=2018 AND round='Final'")"
+echo $($PSQL "SELECT t.name FROM teams t LEFT JOIN games g ON t.team_id=g.winner_id WHERE g.year=2018 AND round='Final'")
 
 echo -e "\nList of teams who played in the 2014 'Eighth-Final' round:"
-echo "$($PSQL "SELECT t.name FROM games AS g LEFT JOIN teams AS t ON ( g.winner_id = t.team_id OR g.opponent_id = t.team_id ) WHERE year=2014 AND round='Eighth-Final' ORDER BY t.name ASC")"
+echo $($PSQL "SELECT t.name FROM games g FULL JOIN teams t ON g.winner_id=t.team_id OR g.opponent_id=t.team_id WHERE (g.year='2014' AND g.round='Eighth-Final') ORDER BY t.name")
 
 echo -e "\nList of unique winning team names in the whole data set:"
-echo "$($PSQL "SELECT DISTINCT(t.name) FROM games AS g LEFT JOIN teams AS t ON g.winner_id = t.team_id ORDER BY t.name ASC")"
+echo $($PSQL "SELECT DISTINCT(t.name) FROM games g LEFT JOIN teams t ON g.winner_id=t.team_id ORDER BY t.name")
 
 echo -e "\nYear and team name of all the champions:"
-echo "$($PSQL "SELECT g.year, t.name FROM games AS g LEFT JOIN teams AS t ON g.winner_id = t.team_id WHERE g.round='Final' ORDER BY g.year ASC")"
+echo $($PSQL "SELECT g.year, t.name FROM games g LEFT JOIN teams t ON g.winner_id=t.team_id WHERE round='Final' ORDER BY g.year")
 
 echo -e "\nList of teams that start with 'Co':"
-echo "$($PSQL "SELECT t.name FROM games AS g LEFT JOIN teams AS t ON ( g.winner_id = t.team_id OR g.opponent_id = t.team_id ) WHERE t.name LIKE 'Co%' GROUP BY t.name")"
+echo $($PSQL "SELECT name FROM teams WHERE name LIKE 'Co%'")
